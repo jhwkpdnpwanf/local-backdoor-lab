@@ -17,7 +17,6 @@
 
 1. **리버스 셸 실습**  
    * 리버스 셸 개념 소개
-   * CTF 예제 학습
 
 2. **백도어 지속성 확보**  
    * crontab, systemd, bashrc, Windows Startup 등 다양한 지속화 기법 실습
