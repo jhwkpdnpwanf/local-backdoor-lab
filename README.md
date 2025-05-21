@@ -8,7 +8,7 @@
 ### 학습 환경  
 * **가상화 환경**: VMware Workstation Pro
 * **공격 대상 환경**: Kali Linux (VM)
-* **호스트 OS**: Windows 11 (WSL)
+* **호스트 OS**: Windows 11 (WSL 사용)
 <br>
 
 
