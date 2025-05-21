@@ -1,4 +1,4 @@
-﻿# local-vm-backdoor-lab
+﻿# local-backdoor-lab
 
 > 이 프로젝트는 오로지 보안 학습 목적입니다.  
 > 모든 실습은 로컬 환경(VMware)에서만 실행되며, 실제 외부 시스템을 대상으로 실행하지 않습니다.  
