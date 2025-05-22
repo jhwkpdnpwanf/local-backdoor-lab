@@ -24,8 +24,8 @@
    * Implantation & Persistence Techniques 
    * Stealth, Triggering Mechanisms & C2 Communication
 
-**[03] Kernel-Level Rootkit**  
-   * Background: Kernel-Level Rootkits
+**[03] Kernel-Level Backdoor**  
+   * Background: Kernel-Level Backdoor
    * System Call Hooking, Stealth & Trigger Techniques
 
 **[04] Detection & Incident Response**  
