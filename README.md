@@ -1,4 +1,4 @@
-﻿# local-backdoor-lab
+﻿# 로컬 환경에서 백도어 실습
 
 > 이 프로젝트는 오로지 보안 학습 목적입니다.  
 > 모든 실습은 로컬 환경(VMware)에서만 실행되며, 실제 외부 시스템을 대상으로 실행하지 않습니다.  
@@ -15,20 +15,25 @@
 
 ### 실습 커리큘럼
 
-1. **리버스 쉘 실습**  
-   * 리버스 쉘 개념
-   * 리버스 쉘 안정
+**[01] Reverse Shell**  
+   * Background: Reverse Shell
+   * Stabilizing a Reverse Shell
 
-2. **백도어 제작**  
-   * 백도어 개념 및 조건
-   * 백도어 제작 실습
+**[02] User-Level Backdoor**  
+   * Background: Backdoor  
+   * Implantation & Persistence Techniques 
+   * Stealth, Triggering Mechanisms & C2 Communication
 
-3. **탐지 및 분석 실습**  
-   * 여러 방법을 통한 탐지 실습
+**[03] Kernel-Level Rootkit**  
+   * Background: Kernel-Level Rootkits
+   * System Call Hooking, Stealth & Trigger Techniques
 
-4. **커널 백도어 실습**  
-   * LKM 기반 백도어(boopkit) 설치, 트리거, 은폐 실습
+**[04] Detection & Incident Response**  
+   * Background: Anomaly Detection
+   * Detection: User-Level Backdoors
+   * Detection: Kernel-Level Backdoors
+   * Incident Response 절차
 
-5. **백도어 탐지기 제작**  
-   * python을 이용한 간단한 백도어 탐지기 구현
+**[05] Backdoor Scanner Development**
+   * Backdoor Scanner
 
