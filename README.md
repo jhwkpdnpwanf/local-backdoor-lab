@@ -21,8 +21,8 @@
 
 **[02] User-Level Backdoor**  
    * Background: Backdoor  
-   * Implantation & Persistence
-   * Stealth, Triggering Mechanisms & C2 Communication
+   * Implantation & Stealth
+   * Triggering & Persistence
 
 **[03] Kernel-Level Backdoor**  
    * Background: Kernel-Level Backdoor
