@@ -22,14 +22,15 @@ https://github.com/m0nad/Diamorphine
 <br>
 
 ```bash
-git clone https://github.com/m0nad/Diamorphine
+git clone https://github.com/m0nad/Diamorphine.git
 ```
 
-다음으로 `make` 로 컴파일을 시켜준다.  
-그러면 `diamorphine.ko` 파일을 생성되는데 이골 실행해주면 된다.  
+
+<img width="1054" height="329" alt="image" src="https://github.com/user-attachments/assets/12f6719b-490a-4bcd-bc36-119b1b0bf34a" />
+
+<img width="956" height="312" alt="image" src="https://github.com/user-attachments/assets/062f2145-e457-4863-9e64-2a1b70582e47" />
 
 
-****************
-리눅스 헤더 지원 X   
-6.x 이전 버전 다 지워짐  
-대안 Ubuntu 18.04 LTS  
+<img width="802" height="100" alt="image" src="https://github.com/user-attachments/assets/046273e0-ca1a-40ee-a373-f978846dca3d" />
+
+
