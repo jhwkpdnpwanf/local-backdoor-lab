@@ -227,11 +227,13 @@ SIGINVIS를 작동시키기 위해 31 번 시그널을 1440 PID 에 보내주고
 
 **코드 분석**
 ```c
-case SIGINVIS:
-  if ((task = find_task(pid)) == NULL)
-    return -ESRCH;
-  task->flags ^= PF_INVISIBLE;
-  break;
+struct task_struct *task;
+switch (sig) {
+	case SIGINVIS:
+		if ((task = find_task(pid)) == NULL)
+			return -ESRCH;
+		task->flags ^= PF_INVISIBLE;
+		break;
 ```
 ```c
 find_task(pid_t pid)
@@ -244,4 +246,28 @@ find_task(pid_t pid)
 	return NULL;
 }
 ```
+```c
+#define PF_INVISIBLE 0x10000000
+```
 
+SIGINVIS 시그널을 받은경우에는 우선 해당 프로세스의 pid 가 존재하는지 find_task 함수로 확인한다.   
+전체 프로세스를 돌아보면서 만약 없다면 -ESRCH ( /* No such process */ ) 에로코드를 반환한다.  
+
+그게 아니라면 PF_INVISIBLE 값으로 플래그를 수정한다.   
+PF_INVISIBLE 은 diamorphine.h 에 정의되어 있고 프로세스 숨김 용도로 쓰기 위해 만든 플래그이다.  
+당연히 기존 커널에는 없고 flags 
+
+~  
+~  
+
+분석 후 내용 추가 필요
+
+<br>
+
+### SIGSUPER: 권한 상승  
+
+- 임시로 u1 유저 생성
+- 쉘 전환 후 kill 입력 (64 시그널)
+- root 쉘 획득
+
+<img width="937" height="242" alt="image" src="https://github.com/user-attachments/assets/01b7da57-bea4-486a-9cc7-5df5d338213a" />
